@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 find_package(OpenCV REQUIRED)
+find_package(Boost COMPONENTS filesystem)
 
 ##############
 ## Services ##
@@ -49,7 +50,7 @@ add_executable(fiducial_slam src/fiducial_slam.cpp
 add_dependencies(fiducial_slam ${${PROJECT_NAME}_EXPORTED_TARGETS}
                  ${catkin_EXPORTED_TARGETS})
 
-target_link_libraries(fiducial_slam ${catkin_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(fiducial_slam ${catkin_LIBRARIES} ${OpenCV_LIBS} ${Boost_LIBRARIES})
 
 #############
 ## Install ##
