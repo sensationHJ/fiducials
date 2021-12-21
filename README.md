@@ -31,6 +31,9 @@ the problem.
 
 ## 희준 변경 사항
 Error가 발생함
+
+**boost의 Library Link가 되지 않은 문제!!**
+
 ```bash
 /usr/bin/ld: CMakeFiles/fiducial_slam.dir/src/map.cpp.o: in function `boost::filesystem::path::parent_path() const':
 map.cpp:(.text._ZNK5boost10filesystem4path11parent_pathEv[_ZNK5boost10filesystem4path11parent_pathEv]+0x2c): undefined reference to `boost::filesystem::path::find_parent_path_size() const'
