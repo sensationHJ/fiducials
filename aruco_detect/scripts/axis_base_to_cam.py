@@ -94,34 +94,31 @@ if __name__ == '__main__':
     T_0tocam = Tmat(dh_table[0,:])
     T_0tofidp = Tmat(dh_table)
     T_0tofid = T_0tofidp @ H_rot_mat(roll, pitch, yaw)
+
+    T_camtofid = Tmat(dh_table[1:,:])
+
+    T_base_to_laser = Tmat(dh_base_to_fid[0, :])
     T_base_to_fid = Tmat(dh_base_to_fid)
+    T_fidtocam = np.linalg.inv(T_camtofid)
+
+    T_base_to_cam = T_base_to_fid @ T_fidtocam
 
     p_zero = np.array([0,0,0,1])
     unit_x = np.array([0.5,0,0,1])
     unit_y = np.array([0,0.5,0,1])
     unit_z = np.array([0,0,0.5,1])
 
-    cam_0 = T_0tocam @ p_zero
-    cam_x_vec = T_0tocam @ unit_x
-    cam_y_vec = T_0tocam @ unit_y
-    cam_z_vec = T_0tocam @ unit_z
-
-    fidp_0 = T_0tofidp @ p_zero
-    fidp_x_vec = T_0tofidp @ unit_x
-    fidp_y_vec = T_0tofidp @ unit_y
-    fidp_z_vec = T_0tofidp @ unit_z
-
-    fid_0 = T_0tofid @ p_zero
-    fid_x_vec = T_0tofid @ unit_x
-    fid_y_vec = T_0tofid @ unit_y
-    fid_z_vec = T_0tofid @ unit_z
+    base_x = unit_x
+    base_y = unit_y
+    base_z = unit_z
+    
 
 
-    a = Arrow3D([0, cam_x_vec[0]], [0, cam_x_vec[1]], [0, cam_x_vec[2]], **arrow_prop_dict, color='r')
+    a = Arrow3D([0, base_x[0]], [0, base_x[1]], [0, base_x[2]], **arrow_prop_dict, color='r')
     ax1.add_artist(a)
-    a = Arrow3D([0, cam_y_vec[0]], [0, cam_y_vec[1]], [0, cam_y_vec[2]], **arrow_prop_dict, color='g')
+    a = Arrow3D([0, base_y[0]], [0, base_y[1]], [0, base_y[2]], **arrow_prop_dict, color='g')
     ax1.add_artist(a)
-    a = Arrow3D([0, cam_z_vec[0]], [0, cam_z_vec[1]], [0, cam_z_vec[2]], **arrow_prop_dict, color='b')
+    a = Arrow3D([0, base_z[0]], [0, base_z[1]], [0, base_z[2]], **arrow_prop_dict, color='b')
     ax1.add_artist(a)
 
     a = Arrow3D([fidp_0[0], fid_x_vec[0]], [fidp_0[1], fid_x_vec[1]], [fidp_0[2], fid_x_vec[2]], **arrow_prop_dict, color='r')
