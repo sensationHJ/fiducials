@@ -73,29 +73,35 @@ if __name__ == '__main__':
     # Here we create the arrows:
     arrow_prop_dict = dict(mutation_scale=10, arrowstyle='->', shrinkA=0, shrinkB=0)
 
-    roll = -2.74
-    pitch = 0.04
+    roll = -2.69
+    pitch = 0.03
     yaw = 0.0
+    x_offset = 0.07
+    y_offset = 0.39
+    z_offset = 1.91
 
     x_w = np.array([1, 0, 0])
     y_w = np.array([0, 1, 0])
     z_w = np.array([0, 0, 1])
 
+# dh -> theta, d ,a, alpha
+
     dh_table = np.array([[-np.pi/2, 0, 0, -np.pi/2],
-                         [0,        1.77,   0,  0.08],
+                         [0,        z_offset,   x_offset, 0],
                          [np.pi/2,   0,  0,  0],
-                         [0,                0,  0.52,  0],
+                         [0,                0,  y_offset,  0],
                          [-np.pi/2,  0,      0,  0]])
 
-    dh_base_to_fid = np.array([[0, 0.105, 0.12, 0],
+    dh_base_to_fid = np.array([[0, 0.12, 0.105, 0],
                                 [0, 0, 1.305, 0],
-                                [np.deg2rad(-90), 0, np.deg2rad(90), 0]])
+                                [-np.pi/2, 0, 0, np.pi/2]])
 
-    T_0tocam = Tmat(dh_table[0,:])
+    # T_0tocam = Tmat(dh_table[0,:])
     T_0tofidp = Tmat(dh_table)
     T_0tofid = T_0tofidp @ H_rot_mat(roll, pitch, yaw)
 
-    T_camtofid = Tmat(dh_table[1:,:])
+    T_camtofid = Tmat(dh_table[1:,:]) @ H_rot_mat(roll, pitch, yaw)
+
 
     T_base_to_laser = Tmat(dh_base_to_fid[0, :])
     T_base_to_fid = Tmat(dh_base_to_fid)
@@ -104,15 +110,31 @@ if __name__ == '__main__':
     T_base_to_cam = T_base_to_fid @ T_fidtocam
 
     p_zero = np.array([0,0,0,1])
-    unit_x = np.array([0.5,0,0,1])
-    unit_y = np.array([0,0.5,0,1])
-    unit_z = np.array([0,0,0.5,1])
+    unit_x = np.array([0.3,0,0,1])
+    unit_y = np.array([0,0.3,0,1])
+    unit_z = np.array([0,0,0.3,1])
 
     base_x = unit_x
     base_y = unit_y
     base_z = unit_z
     
+    print('T_base_to_cam = ')
+    print(T_base_to_cam)
 
+    cam_zero = T_base_to_cam @ p_zero
+    cam_x = T_base_to_cam @ unit_x
+    cam_y = T_base_to_cam @ unit_y
+    cam_z = T_base_to_cam @ unit_z
+
+    laser_zero = T_base_to_laser @ p_zero
+    laser_x = T_base_to_laser @ unit_x
+    laser_y = T_base_to_laser @ unit_y
+    laser_z = T_base_to_laser @ unit_z
+
+    fid_zero = T_base_to_fid @ p_zero
+    fid_x = T_base_to_fid @ unit_x
+    fid_y = T_base_to_fid @ unit_y
+    fid_z = T_base_to_fid @ unit_z
 
     a = Arrow3D([0, base_x[0]], [0, base_x[1]], [0, base_x[2]], **arrow_prop_dict, color='r')
     ax1.add_artist(a)
@@ -121,11 +143,25 @@ if __name__ == '__main__':
     a = Arrow3D([0, base_z[0]], [0, base_z[1]], [0, base_z[2]], **arrow_prop_dict, color='b')
     ax1.add_artist(a)
 
-    a = Arrow3D([fidp_0[0], fid_x_vec[0]], [fidp_0[1], fid_x_vec[1]], [fidp_0[2], fid_x_vec[2]], **arrow_prop_dict, color='r')
+    a = Arrow3D([laser_zero[0], laser_x[0]], [laser_zero[1], laser_x[1]], [laser_zero[2], laser_x[2]], **arrow_prop_dict, color='r')
     ax1.add_artist(a)
-    a = Arrow3D([fidp_0[0], fid_y_vec[0]], [fidp_0[1], fid_y_vec[1]], [fidp_0[2], fid_y_vec[2]], **arrow_prop_dict, color='g')
+    a = Arrow3D([laser_zero[0], laser_y[0]], [laser_zero[1], laser_y[1]], [laser_zero[2], laser_y[2]], **arrow_prop_dict, color='g')
     ax1.add_artist(a)
-    a = Arrow3D([fidp_0[0], fid_z_vec[0]], [fidp_0[1], fid_z_vec[1]], [fidp_0[2], fid_z_vec[2]], **arrow_prop_dict, color='b')
+    a = Arrow3D([laser_zero[0], laser_z[0]], [laser_zero[1], laser_z[1]], [laser_zero[2], laser_z[2]], **arrow_prop_dict, color='b')
+    ax1.add_artist(a)
+
+    a = Arrow3D([fid_zero[0], fid_x[0]], [fid_zero[1], fid_x[1]], [fid_zero[2], fid_x[2]], **arrow_prop_dict, color='r')
+    ax1.add_artist(a)
+    a = Arrow3D([fid_zero[0], fid_y[0]], [fid_zero[1], fid_y[1]], [fid_zero[2], fid_y[2]], **arrow_prop_dict, color='g')
+    ax1.add_artist(a)
+    a = Arrow3D([fid_zero[0], fid_z[0]], [fid_zero[1], fid_z[1]], [fid_zero[2], fid_z[2]], **arrow_prop_dict, color='b')
+    ax1.add_artist(a)
+
+    a = Arrow3D([cam_zero[0], cam_x[0]], [cam_zero[1], cam_x[1]], [cam_zero[2], cam_x[2]], **arrow_prop_dict, color='r')
+    ax1.add_artist(a)
+    a = Arrow3D([cam_zero[0], cam_y[0]], [cam_zero[1], cam_y[1]], [cam_zero[2], cam_y[2]], **arrow_prop_dict, color='g')
+    ax1.add_artist(a)
+    a = Arrow3D([cam_zero[0], cam_z[0]], [cam_zero[1], cam_z[1]], [cam_zero[2], cam_z[2]], **arrow_prop_dict, color='b')
     ax1.add_artist(a)
 
     max_range = 2
@@ -134,14 +170,24 @@ if __name__ == '__main__':
     ax1.set_zlim3d(-1, max_range)
     # Give them a name:
 
-    ax1.text(0.0, 0.0, -0.1, r'$0$', fontsize=5)
-    ax1.text(cam_x_vec[0], cam_x_vec[1], cam_x_vec[2], r'$x_{cam}$', fontsize=5)
-    ax1.text(cam_y_vec[0], cam_y_vec[1], cam_y_vec[2], r'$y_{cam}$', fontsize=5)
-    ax1.text(cam_z_vec[0], cam_z_vec[1], cam_z_vec[2], r'$z_{cam}$', fontsize=5)
+    ax1.text(0.0, 0.0, -0.1, r'$base$', fontsize=5)
+    ax1.text(base_x[0], base_x[1], base_x[2], r'$x_{base}$', fontsize=5)
+    ax1.text(base_y[0], base_y[1], base_y[2], r'$y_{base}$', fontsize=5)
+    ax1.text(base_z[0], base_z[1], base_z[2], r'$z_{base}$', fontsize=5)
 
-    ax1.text(fidp_0[0], fidp_0[1], fidp_0[2 ]-0.1, r'$fid$', fontsize=5)
-    ax1.text(fid_x_vec[0], fid_x_vec[1], fid_x_vec[2], r'$x_{fid}$', fontsize=5)
-    ax1.text(fid_y_vec[0], fid_y_vec[1], fid_y_vec[2], r'$y_{fid}$', fontsize=5)
-    ax1.text(fid_z_vec[0], fid_z_vec[1], fid_z_vec[2], r'$z_{fid}$', fontsize=5)
+    ax1.text(laser_zero[0], laser_zero[1], laser_zero[2]-0.1, r'$laser$', fontsize=5)
+    ax1.text(laser_x[0], laser_x[1], laser_x[2], r'$x_{laser}$', fontsize=5)
+    ax1.text(laser_y[0], laser_y[1], laser_y[2], r'$y_{laser}$', fontsize=5)
+    ax1.text(laser_z[0], laser_z[1], laser_z[2], r'$z_{laser}$', fontsize=5)
+
+    ax1.text(fid_zero[0], fid_zero[1], fid_zero[2]-0.1, r'$fid$', fontsize=5)
+    ax1.text(fid_x[0], fid_x[1], fid_x[2], r'$x_{fid}$', fontsize=5)
+    ax1.text(fid_y[0], fid_y[1], fid_y[2], r'$y_{fid}$', fontsize=5)
+    ax1.text(fid_z[0], fid_z[1], fid_z[2], r'$z_{fid}$', fontsize=5)
+
+    ax1.text(cam_zero[0], cam_zero[1], cam_zero[2]-0.1, r'$cam$', fontsize=5)
+    ax1.text(cam_x[0], cam_x[1], cam_x[2], r'$x_{cam}$', fontsize=5)
+    ax1.text(cam_y[0], cam_y[1], cam_y[2], r'$y_{cam}$', fontsize=5)
+    ax1.text(cam_z[0], cam_z[1], cam_z[2], r'$z_{cam}$', fontsize=5)
 
     plt.show()

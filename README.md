@@ -30,7 +30,9 @@ Drive and link to it in your issue, this will help us diagnose
 the problem. 
 
 ## 희준 변경 사항
-Error가 발생함
+Error 없앰
+
+`src/fiducials/aruco_detect/scripts/axis_base_to_cam.py ` 여기에 Eligen base to cam tf를 계산해놓음
 
 ### 1. boost의 Library Link가 되지 않은 문제!!
 
